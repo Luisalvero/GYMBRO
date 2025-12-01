@@ -11,8 +11,8 @@ if (!$currentUser) {
 }
 
 // Decode current user's data
-$currentUserWorkoutStyles = json_decode($currentUser['workout_styles'], true) ?? [];
-$preferredPartnerGenders = json_decode($currentUser['preferred_partner_genders'], true);
+$currentUserWorkoutStyles = json_decode($currentUser['workout_styles'] ?? '[]', true) ?? [];
+$preferredPartnerGenders = json_decode($currentUser['preferred_partner_genders'] ?? 'null', true);
 
 // Build query to find potential matches
 $db = getDb();

@@ -31,9 +31,17 @@ function getDb() {
 // Session management
 function startSession() {
     if (session_status() === PHP_SESSION_NONE) {
+        // Only set secure cookie if using HTTPS
+        $isSecure = (!empty($_SERVER['HTTPS']) && $_SERVER['HTTPS'] !== 'off') 
+                    || (!empty($_SERVER['HTTP_X_FORWARDED_PROTO']) && $_SERVER['HTTP_X_FORWARDED_PROTO'] === 'https')
+                    || (!empty($_SERVER['SERVER_PORT']) && $_SERVER['SERVER_PORT'] == 443);
+        
         ini_set('session.cookie_httponly', 1);
+        ini_set('session.cookie_secure', $isSecure ? 1 : 0);
         ini_set('session.use_strict_mode', 1);
+        ini_set('session.use_only_cookies', 1);
         ini_set('session.cookie_samesite', 'Lax');
+        ini_set('session.gc_maxlifetime', 3600); // 1 hour
         session_start();
     }
 }
@@ -48,6 +56,30 @@ function generateCsrfToken() {
 
 function validateCsrfToken($token) {
     return isset($_SESSION['csrf_token']) && hash_equals($_SESSION['csrf_token'], $token);
+}
+
+function rotateCsrfToken() {
+    $_SESSION['csrf_token'] = bin2hex(random_bytes(32));
+    return $_SESSION['csrf_token'];
+}
+
+// Regenerate session on authentication to prevent session fixation
+function regenerateSessionOnAuth() {
+    // Store any data we need to preserve
+    $oldSessionData = $_SESSION;
+    
+    // Regenerate session ID (destroy old session)
+    session_regenerate_id(true);
+    
+    // Restore flash messages if any (they should persist through login)
+    if (isset($oldSessionData['flash'])) {
+        $_SESSION['flash'] = $oldSessionData['flash'];
+    }
+    
+    $_SESSION['last_regeneration'] = time();
+    
+    // Generate new CSRF token for the new session
+    $_SESSION['csrf_token'] = bin2hex(random_bytes(32));
 }
 
 // Authentication helpers

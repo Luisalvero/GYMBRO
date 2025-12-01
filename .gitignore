@@ -1,3 +1,4 @@
+# DDEV
 .ddev/.gitignore
 .ddev/.homeadditions
 .ddev/.global_commands
@@ -8,6 +9,32 @@
 .ddev/import.yaml
 .ddev/config.local.yaml
 .ddev/.dbimageBuild
+
+# Dependencies
 vendor/
+
+# Environment files (keep example files)
 .env
+.env.local
+.env.production
+
+# OS files
 .DS_Store
+Thumbs.db
+
+# IDE
+.idea/
+.vscode/
+*.swp
+*.swo
+
+# Logs
+storage/logs/*.log
+
+# Uploaded files (keep directory structure)
+public/uploads/posts/*
+!public/uploads/posts/.gitkeep
+
+# Cache
+storage/cache/*
+!storage/cache/.gitkeep

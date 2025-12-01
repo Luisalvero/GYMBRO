@@ -110,6 +110,9 @@ try {
     
     $userId = $db->lastInsertId();
     
+    // Regenerate session to prevent session fixation attacks
+    regenerateSessionOnAuth();
+    
     // Log the user in
     $_SESSION['user_id'] = $userId;
     $_SESSION['user_name'] = $name;

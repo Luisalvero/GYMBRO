@@ -1,4 +1,6 @@
--- GymBro Database Schema
+-- GymBro Initial Schema Migration
+-- Version: 001
+-- Date: 2024-12-01
 
 -- Users table with all profile fields
 CREATE TABLE IF NOT EXISTS users (
@@ -45,8 +47,7 @@ CREATE TABLE IF NOT EXISTS matches (
     FOREIGN KEY (user2_id) REFERENCES users(id) ON DELETE CASCADE,
     UNIQUE KEY unique_match (user1_id, user2_id),
     INDEX idx_user1 (user1_id),
-    INDEX idx_user2 (user2_id),
-    CHECK (user1_id < user2_id)
+    INDEX idx_user2 (user2_id)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 -- Posts table for feed content
@@ -56,24 +57,16 @@ CREATE TABLE IF NOT EXISTS posts (
     post_type ENUM('achievement', 'media', 'forum', 'meetup') NOT NULL,
     title VARCHAR(255) DEFAULT NULL,
     content TEXT DEFAULT NULL,
-    
-    -- Achievement specific fields
     achievement_type VARCHAR(100) DEFAULT NULL COMMENT 'e.g., PR, streak, milestone',
     achievement_value VARCHAR(100) DEFAULT NULL COMMENT 'e.g., 225 lbs, 30 days',
-    
-    -- Media specific fields (photos/videos)
     media_urls JSON DEFAULT NULL COMMENT 'Array of image/video URLs',
-    
-    -- Meetup specific fields
     meetup_datetime DATETIME DEFAULT NULL,
     meetup_location_name VARCHAR(255) DEFAULT NULL,
     meetup_latitude DECIMAL(10, 8) DEFAULT NULL,
     meetup_longitude DECIMAL(11, 8) DEFAULT NULL,
     meetup_max_attendees INT DEFAULT NULL,
-    
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-    
     FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE,
     INDEX idx_user_id (user_id),
     INDEX idx_post_type (post_type),

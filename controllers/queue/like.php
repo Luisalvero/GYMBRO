@@ -16,6 +16,12 @@ if ($likedUserId <= 0) {
 try {
     $db = getDb();
     
+    // Get liked user's name for potential match display
+    $stmt = $db->prepare('SELECT name FROM users WHERE id = ?');
+    $stmt->execute([$likedUserId]);
+    $likedUser = $stmt->fetch();
+    $likedUserName = $likedUser ? $likedUser['name'] : 'your new bro';
+    
     // Insert like
     $stmt = $db->prepare('INSERT INTO likes (liker_id, liked_id) VALUES (?, ?) ON DUPLICATE KEY UPDATE liker_id=liker_id');
     $stmt->execute([$userId, $likedUserId]);
@@ -39,6 +45,7 @@ try {
     jsonResponse([
         'success' => true,
         'is_match' => $isMatch,
+        'matched_user_name' => $isMatch ? $likedUserName : null,
         'message' => $isMatch ? "It's a match! 🎉" : 'Like sent!'
     ]);
     

@@ -1,6 +1,11 @@
 <?php
+/**
+ * GymBro Application Entry Point
+ * 
+ * All requests are routed through this file
+ */
 
-require_once __DIR__ . '/../src/helpers.php';
+require_once __DIR__ . '/../src/bootstrap.php';
 
 startSession();
 
@@ -34,6 +39,12 @@ $routes = [
         '/profile/update' => 'controllers/profile/update.php',
         '/queue/like' => 'controllers/queue/like.php',
         '/queue/pass' => 'controllers/queue/pass.php',
+        '/feed/post' => 'controllers/feed/create_post.php',
+        '/feed/like' => 'controllers/feed/like_post.php',
+        '/feed/comment' => 'controllers/feed/comment.php',
+        '/feed/rsvp' => 'controllers/feed/rsvp.php',
+        '/feed/edit' => 'controllers/feed/edit_post.php',
+        '/feed/delete' => 'controllers/feed/delete_post.php',
     ],
 ];
 

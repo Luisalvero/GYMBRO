@@ -13,8 +13,8 @@
             --bg-dark: #0a0a0a;
             --bg-darker: #050505;
             --bg-card: #151515;
-            --primary: #00ff88;
-            --primary-hover: #00cc6e;
+            --primary: #ff4444;
+            --primary-hover: #cc3333;
             --danger: #ff0055;
             --text: #ffffff;
             --text-muted: #888888;
@@ -63,12 +63,12 @@
             color: var(--primary) !important;
             font-size: 1.8rem;
             font-weight: 700;
-            text-shadow: 0 0 20px rgba(0, 255, 136, 0.3);
+            text-shadow: 0 0 20px rgba(255, 68, 68, 0.3);
             transition: all 0.3s ease;
         }
         
         .navbar-brand:hover {
-            text-shadow: 0 0 30px rgba(0, 255, 136, 0.5);
+            text-shadow: 0 0 30px rgba(255, 68, 68, 0.5);
             transform: scale(1.05);
         }
         
@@ -102,7 +102,7 @@
         }
         
         .btn-primary {
-            background: linear-gradient(135deg, var(--primary) 0%, #00d47a 100%);
+            background: linear-gradient(135deg, var(--primary) 0%, #dd3636 100%);
             border: none;
             color: #000;
             font-weight: 600;
@@ -110,13 +110,13 @@
             letter-spacing: 0.5px;
             padding: 0.6rem 1.5rem;
             transition: all 0.3s ease;
-            box-shadow: 0 4px 15px rgba(0, 255, 136, 0.3);
+            box-shadow: 0 4px 15px rgba(255, 68, 68, 0.3);
         }
         
         .btn-primary:hover {
-            background: linear-gradient(135deg, var(--primary-hover) 0%, #00b368 100%);
+            background: linear-gradient(135deg, var(--primary-hover) 0%, #bb2828 100%);
             transform: translateY(-2px);
-            box-shadow: 0 6px 25px rgba(0, 255, 136, 0.4);
+            box-shadow: 0 6px 25px rgba(255, 68, 68, 0.4);
             color: #000;
         }
         
@@ -134,7 +134,7 @@
             background: var(--primary);
             color: #000;
             transform: translateY(-2px);
-            box-shadow: 0 4px 15px rgba(0, 255, 136, 0.3);
+            box-shadow: 0 4px 15px rgba(255, 68, 68, 0.3);
         }
         
         .btn-outline-secondary {
@@ -176,14 +176,14 @@
         }
         
         .card-profile {
-            box-shadow: 0 4px 20px rgba(0, 255, 136, 0.1);
+            box-shadow: 0 4px 20px rgba(255, 68, 68, 0.1);
             transition: all 0.3s ease;
             border: 1px solid var(--border);
         }
         
         .card-profile:hover {
             transform: translateY(-5px);
-            box-shadow: 0 8px 30px rgba(0, 255, 136, 0.2);
+            box-shadow: 0 8px 30px rgba(255, 68, 68, 0.2);
             border-color: var(--primary);
         }
         
@@ -199,7 +199,7 @@
             background: var(--bg-darker);
             border-color: var(--primary);
             color: var(--text);
-            box-shadow: 0 0 0 0.2rem rgba(0, 255, 136, 0.1);
+            box-shadow: 0 0 0 0.2rem rgba(255, 68, 68, 0.1);
         }
         
         .form-control::placeholder {
@@ -230,7 +230,7 @@
         }
         
         .badge-workout {
-            background: linear-gradient(135deg, var(--primary) 0%, #00d47a 100%);
+            background: linear-gradient(135deg, var(--primary) 0%, #dd3636 100%);
             color: #000;
             font-size: 0.75rem;
             padding: 0.4em 0.8em;
@@ -259,7 +259,7 @@
         
         .alert-success {
             border-left-color: var(--primary);
-            background: rgba(0, 255, 136, 0.1);
+            background: rgba(255, 68, 68, 0.1);
         }
         
         .alert-danger {
@@ -294,7 +294,7 @@
         }
         
         .shadow, .shadow-sm, .shadow-lg {
-            box-shadow: 0 4px 20px rgba(0, 255, 136, 0.1) !important;
+            box-shadow: 0 4px 20px rgba(255, 68, 68, 0.1) !important;
         }
         
         a {

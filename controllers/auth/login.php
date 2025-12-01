@@ -34,6 +34,8 @@ if (empty($errors)) {
     $user = $stmt->fetch();
     
     if ($user && password_verify($password, $user['password_hash'])) {
+        // Regenerate session to prevent session fixation attacks
+        regenerateSessionOnAuth();
         $_SESSION['user_id'] = $user['id'];
         $_SESSION['user_name'] = $user['name'];
         setFlash('success', 'Welcome back, ' . $user['name'] . '!');

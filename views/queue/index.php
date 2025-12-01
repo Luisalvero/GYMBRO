@@ -120,13 +120,299 @@ function handleLikeResponse(event) {
     const response = JSON.parse(event.detail.xhr.response);
     if (response.success) {
         if (response.is_match) {
-            alert('🎉 ' + response.message);
+            showMatchPopup(response.matched_user_name);
+        } else {
+            window.location.reload();
         }
-        window.location.reload();
     } else {
         alert('Error: ' + response.message);
     }
 }
+
+function showMatchPopup(matchedUserName) {
+    // Create overlay
+    const overlay = document.createElement('div');
+    overlay.className = 'match-overlay';
+    overlay.innerHTML = `
+        <div class="match-glow-lines">
+            <div class="glow-line glow-line-1"></div>
+            <div class="glow-line glow-line-2"></div>
+            <div class="glow-line glow-line-3"></div>
+            <div class="glow-line glow-line-4"></div>
+            <div class="glow-line glow-line-5"></div>
+            <div class="glow-line glow-line-6"></div>
+        </div>
+        <div class="match-popup">
+            <div class="match-icon">
+                <i class="bi bi-heart-fill"></i>
+                <i class="bi bi-heart-fill"></i>
+            </div>
+            <h2 class="match-title">IT'S A MATCH!</h2>
+            <p class="match-subtitle">You and <strong>${matchedUserName || 'your new bro'}</strong> liked each other</p>
+            <div class="match-actions">
+                <button class="btn btn-primary btn-lg" onclick="window.location.href='/matches'">
+                    <i class="bi bi-chat-dots"></i> View Matches
+                </button>
+                <button class="btn btn-outline-primary btn-lg" onclick="closeMatchPopup()">
+                    <i class="bi bi-arrow-right"></i> Keep Swiping
+                </button>
+            </div>
+        </div>
+    `;
+    document.body.appendChild(overlay);
+    
+    // Trigger animation
+    requestAnimationFrame(() => {
+        overlay.classList.add('show');
+    });
+}
+
+function closeMatchPopup() {
+    const overlay = document.querySelector('.match-overlay');
+    if (overlay) {
+        overlay.classList.remove('show');
+        overlay.classList.add('hide');
+        setTimeout(() => {
+            overlay.remove();
+            window.location.reload();
+        }, 300);
+    }
+}
 </script>
+
+<style>
+.match-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.95);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 9999;
+    opacity: 0;
+    transition: opacity 0.3s ease;
+    overflow: hidden;
+}
+
+.match-overlay.show {
+    opacity: 1;
+}
+
+.match-overlay.hide {
+    opacity: 0;
+}
+
+.match-glow-lines {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    pointer-events: none;
+    overflow: hidden;
+}
+
+.glow-line {
+    position: absolute;
+    background: linear-gradient(90deg, 
+        transparent, 
+        rgba(255, 68, 68, 0.3), 
+        rgba(255, 68, 68, 0.8), 
+        rgba(255, 120, 120, 1), 
+        rgba(255, 68, 68, 0.8), 
+        rgba(255, 68, 68, 0.3), 
+        transparent
+    );
+    height: 2px;
+    width: 200%;
+    left: -50%;
+    filter: blur(1px);
+    box-shadow: 
+        0 0 10px rgba(255, 68, 68, 0.5),
+        0 0 20px rgba(255, 68, 68, 0.3),
+        0 0 40px rgba(255, 68, 68, 0.2);
+}
+
+.glow-line-1 {
+    top: 15%;
+    animation: glowMove 3s ease-in-out infinite;
+    animation-delay: 0s;
+}
+
+.glow-line-2 {
+    top: 30%;
+    animation: glowMove 3.5s ease-in-out infinite reverse;
+    animation-delay: 0.5s;
+}
+
+.glow-line-3 {
+    top: 50%;
+    animation: glowMove 2.5s ease-in-out infinite;
+    animation-delay: 1s;
+    height: 3px;
+    background: linear-gradient(90deg, 
+        transparent, 
+        rgba(255, 68, 68, 0.4), 
+        rgba(255, 68, 68, 1), 
+        rgba(255, 150, 150, 1), 
+        rgba(255, 68, 68, 1), 
+        rgba(255, 68, 68, 0.4), 
+        transparent
+    );
+}
+
+.glow-line-4 {
+    top: 65%;
+    animation: glowMove 4s ease-in-out infinite reverse;
+    animation-delay: 0.3s;
+}
+
+.glow-line-5 {
+    top: 80%;
+    animation: glowMove 3s ease-in-out infinite;
+    animation-delay: 0.7s;
+}
+
+.glow-line-6 {
+    top: 92%;
+    animation: glowMove 3.2s ease-in-out infinite reverse;
+    animation-delay: 1.2s;
+}
+
+@keyframes glowMove {
+    0%, 100% {
+        transform: translateX(-25%) rotate(-2deg);
+        opacity: 0.6;
+    }
+    50% {
+        transform: translateX(25%) rotate(2deg);
+        opacity: 1;
+    }
+}
+
+.match-popup {
+    position: relative;
+    z-index: 10;
+    text-align: center;
+    padding: 3rem;
+    animation: popupEnter 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+}
+
+@keyframes popupEnter {
+    0% {
+        transform: scale(0.5);
+        opacity: 0;
+    }
+    100% {
+        transform: scale(1);
+        opacity: 1;
+    }
+}
+
+.match-icon {
+    font-size: 5rem;
+    margin-bottom: 1.5rem;
+    position: relative;
+    display: inline-block;
+}
+
+.match-icon i {
+    color: var(--primary);
+    filter: drop-shadow(0 0 20px rgba(255, 68, 68, 0.8));
+    animation: heartPulse 1s ease-in-out infinite;
+}
+
+.match-icon i:first-child {
+    margin-right: -1rem;
+    animation-delay: 0s;
+}
+
+.match-icon i:last-child {
+    margin-left: -1rem;
+    animation-delay: 0.5s;
+}
+
+@keyframes heartPulse {
+    0%, 100% {
+        transform: scale(1);
+    }
+    50% {
+        transform: scale(1.15);
+    }
+}
+
+.match-title {
+    font-family: 'Rajdhani', sans-serif;
+    font-size: 4rem;
+    font-weight: 700;
+    color: var(--primary);
+    text-shadow: 
+        0 0 20px rgba(255, 68, 68, 0.5),
+        0 0 40px rgba(255, 68, 68, 0.3),
+        0 0 60px rgba(255, 68, 68, 0.2);
+    margin-bottom: 1rem;
+    letter-spacing: 3px;
+    animation: titleGlow 2s ease-in-out infinite;
+}
+
+@keyframes titleGlow {
+    0%, 100% {
+        text-shadow: 
+            0 0 20px rgba(255, 68, 68, 0.5),
+            0 0 40px rgba(255, 68, 68, 0.3),
+            0 0 60px rgba(255, 68, 68, 0.2);
+    }
+    50% {
+        text-shadow: 
+            0 0 30px rgba(255, 68, 68, 0.8),
+            0 0 60px rgba(255, 68, 68, 0.5),
+            0 0 90px rgba(255, 68, 68, 0.3);
+    }
+}
+
+.match-subtitle {
+    font-size: 1.3rem;
+    color: var(--text);
+    margin-bottom: 2.5rem;
+}
+
+.match-subtitle strong {
+    color: var(--primary);
+}
+
+.match-actions {
+    display: flex;
+    gap: 1rem;
+    justify-content: center;
+    flex-wrap: wrap;
+}
+
+.match-actions .btn {
+    min-width: 180px;
+}
+
+@media (max-width: 576px) {
+    .match-title {
+        font-size: 2.5rem;
+    }
+    
+    .match-icon {
+        font-size: 3.5rem;
+    }
+    
+    .match-actions {
+        flex-direction: column;
+        align-items: center;
+    }
+    
+    .match-actions .btn {
+        width: 100%;
+        max-width: 280px;
+    }
+}
+</style>
 
 <?php require __DIR__ . '/../partials/footer.php'; ?>
