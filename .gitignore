@@ -1,0 +1,13 @@
+.ddev/.gitignore
+.ddev/.homeadditions
+.ddev/.global_commands
+.ddev/commands/*/*.example
+.ddev/db_snapshots
+.ddev/import-db
+.ddev/sequelpro.spf
+.ddev/import.yaml
+.ddev/config.local.yaml
+.ddev/.dbimageBuild
+vendor/
+.env
+.DS_Store
