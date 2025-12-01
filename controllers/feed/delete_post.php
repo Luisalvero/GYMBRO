@@ -1,6 +1,6 @@
 <?php
 
-require_once __DIR__ . '/../../src/helpers.php';
+require_once __DIR__ . '/../../src/bootstrap.php';
 
 startSession();
 requireLogin();
@@ -28,7 +28,7 @@ if ($postId <= 0) {
 }
 
 $pdo = getDb();
-$currentUser = getCurrentUser($pdo);
+$currentUser = getCurrentUser();
 
 // Check if post exists and belongs to current user
 $stmt = $pdo->prepare('SELECT id, user_id, media_urls FROM posts WHERE id = ?');
@@ -40,7 +40,7 @@ if (!$post) {
     exit;
 }
 
-if ($post['user_id'] !== $currentUser['id']) {
+if ((int)$post['user_id'] !== (int)$currentUser['id']) {
     http_response_code(403);
     echo json_encode(['success' => false, 'message' => 'You can only delete your own posts']);
     exit;

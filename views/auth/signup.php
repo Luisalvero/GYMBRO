@@ -95,21 +95,27 @@ unset($_SESSION['signup_errors'], $_SESSION['old_input']);
 
                     <div class="mb-3">
                         <label class="form-label">Workout Styles * (Select at least one)</label>
-                        <div class="form-check">
-                            <input class="form-check-input" type="checkbox" name="workout_styles[]" value="calisthenics" id="ws1" <?= in_array('calisthenics', $oldInput['workout_styles'] ?? []) ? 'checked' : '' ?>>
-                            <label class="form-check-label" for="ws1">Calisthenics</label>
-                        </div>
-                        <div class="form-check">
-                            <input class="form-check-input" type="checkbox" name="workout_styles[]" value="weightlifting" id="ws2" <?= in_array('weightlifting', $oldInput['workout_styles'] ?? []) ? 'checked' : '' ?>>
-                            <label class="form-check-label" for="ws2">Weightlifting</label>
-                        </div>
-                        <div class="form-check">
-                            <input class="form-check-input" type="checkbox" name="workout_styles[]" value="cardio" id="ws3" <?= in_array('cardio', $oldInput['workout_styles'] ?? []) ? 'checked' : '' ?>>
-                            <label class="form-check-label" for="ws3">Cardio</label>
-                        </div>
-                        <div class="form-check">
-                            <input class="form-check-input" type="checkbox" name="workout_styles[]" value="athletic" id="ws4" <?= in_array('athletic', $oldInput['workout_styles'] ?? []) ? 'checked' : '' ?>>
-                            <label class="form-check-label" for="ws4">Athletic</label>
+                        <div class="workout-boxes">
+                            <label class="workout-box <?= in_array('calisthenics', $oldInput['workout_styles'] ?? []) ? 'selected' : '' ?>">
+                                <input type="checkbox" name="workout_styles[]" value="calisthenics" <?= in_array('calisthenics', $oldInput['workout_styles'] ?? []) ? 'checked' : '' ?>>
+                                <i class="bi bi-person-arms-up"></i>
+                                <span>Calisthenics</span>
+                            </label>
+                            <label class="workout-box <?= in_array('weightlifting', $oldInput['workout_styles'] ?? []) ? 'selected' : '' ?>">
+                                <input type="checkbox" name="workout_styles[]" value="weightlifting" <?= in_array('weightlifting', $oldInput['workout_styles'] ?? []) ? 'checked' : '' ?>>
+                                <i class="bi bi-trophy"></i>
+                                <span>Weightlifting</span>
+                            </label>
+                            <label class="workout-box <?= in_array('cardio', $oldInput['workout_styles'] ?? []) ? 'selected' : '' ?>">
+                                <input type="checkbox" name="workout_styles[]" value="cardio" <?= in_array('cardio', $oldInput['workout_styles'] ?? []) ? 'checked' : '' ?>>
+                                <i class="bi bi-heart-pulse"></i>
+                                <span>Cardio</span>
+                            </label>
+                            <label class="workout-box <?= in_array('athletic', $oldInput['workout_styles'] ?? []) ? 'selected' : '' ?>">
+                                <input type="checkbox" name="workout_styles[]" value="athletic" <?= in_array('athletic', $oldInput['workout_styles'] ?? []) ? 'checked' : '' ?>>
+                                <i class="bi bi-lightning-charge"></i>
+                                <span>Athletic</span>
+                            </label>
                         </div>
                     </div>
 
@@ -164,5 +170,96 @@ unset($_SESSION['signup_errors'], $_SESSION['old_input']);
         </div>
     </div>
 </div>
+
+<style>
+/* Workout style boxes */
+.workout-boxes {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 1rem;
+}
+
+@media (max-width: 768px) {
+    .workout-boxes {
+        grid-template-columns: repeat(2, 1fr);
+    }
+}
+
+.workout-box {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 1.5rem 1rem;
+    background: var(--bg-darker);
+    border: 2px solid var(--border);
+    border-radius: 12px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    text-align: center;
+}
+
+.workout-box input[type="checkbox"] {
+    display: none;
+}
+
+.workout-box i {
+    font-size: 2rem;
+    margin-bottom: 0.5rem;
+    color: var(--text-muted);
+    transition: all 0.3s ease;
+}
+
+.workout-box span {
+    font-weight: 600;
+    text-transform: uppercase;
+    font-size: 0.85rem;
+    letter-spacing: 0.5px;
+    color: var(--text-muted);
+    transition: all 0.3s ease;
+}
+
+.workout-box:hover {
+    border-color: var(--primary);
+    background: rgba(255, 68, 68, 0.05);
+}
+
+.workout-box:hover i,
+.workout-box:hover span {
+    color: var(--primary);
+}
+
+.workout-box.selected {
+    border-color: var(--primary);
+    background: rgba(255, 68, 68, 0.1);
+    box-shadow: 
+        0 0 20px rgba(255, 68, 68, 0.3),
+        0 0 40px rgba(255, 68, 68, 0.2),
+        inset 0 0 20px rgba(255, 68, 68, 0.1);
+}
+
+.workout-box.selected i {
+    color: var(--primary);
+    filter: drop-shadow(0 0 8px rgba(255, 68, 68, 0.8));
+}
+
+.workout-box.selected span {
+    color: var(--primary);
+    text-shadow: 0 0 10px rgba(255, 68, 68, 0.5);
+}
+</style>
+
+<script>
+document.addEventListener('DOMContentLoaded', () => {
+    // Workout box toggle
+    document.querySelectorAll('.workout-box').forEach(box => {
+        box.addEventListener('click', function() {
+            const checkbox = this.querySelector('input[type="checkbox"]');
+            checkbox.checked = !checkbox.checked;
+            this.classList.toggle('selected', checkbox.checked);
+        });
+    });
+});
+</script>
 
 <?php require __DIR__ . '/../partials/footer.php'; ?>

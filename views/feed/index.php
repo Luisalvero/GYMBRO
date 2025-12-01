@@ -106,7 +106,7 @@ function timeAgo($datetime) {
                             <i class="bi bi-<?= $typeIcons[$post['post_type']] ?>"></i>
                             <?= ucfirst($post['post_type']) ?>
                         </div>
-                        <?php if ($post['user_id'] === $currentUser['id']): ?>
+                        <?php if ((int)$post['user_id'] === (int)$currentUser['id']): ?>
                         <div class="post-menu dropdown">
                             <button class="post-menu-btn" data-bs-toggle="dropdown">
                                 <i class="bi bi-three-dots"></i>
@@ -114,6 +114,7 @@ function timeAgo($datetime) {
                             <ul class="dropdown-menu dropdown-menu-end">
                                 <li>
                                     <button class="dropdown-item edit-post-btn" 
+                                            onclick="openEditModal(<?= $post['id'] ?>, '<?= $post['post_type'] ?>', this)"
                                             data-post-id="<?= $post['id'] ?>"
                                             data-post-type="<?= $post['post_type'] ?>"
                                             data-content="<?= escape($post['content'] ?? '') ?>"
@@ -123,6 +124,7 @@ function timeAgo($datetime) {
                                 </li>
                                 <li>
                                     <button class="dropdown-item delete-post-btn text-danger" 
+                                            onclick="openDeleteModal(<?= $post['id'] ?>)"
                                             data-post-id="<?= $post['id'] ?>">
                                         <i class="bi bi-trash"></i> Delete
                                     </button>
@@ -428,7 +430,7 @@ function timeAgo($datetime) {
             </div>
             <div class="modal-footer">
                 <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">Cancel</button>
-                <button type="button" class="btn btn-primary" id="submitEditPost">
+                <button type="button" class="btn btn-primary" id="submitEditPost" onclick="submitEditPost()">
                     <i class="bi bi-check-lg"></i> Save Changes
                 </button>
             </div>
@@ -450,7 +452,7 @@ function timeAgo($datetime) {
             </div>
             <div class="modal-footer">
                 <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">Cancel</button>
-                <button type="button" class="btn btn-danger" id="confirmDeletePost">
+                <button type="button" class="btn btn-danger" id="confirmDeletePost" onclick="confirmDeletePost()">
                     <i class="bi bi-trash"></i> Delete
                 </button>
             </div>
@@ -1184,6 +1186,109 @@ function timeAgo($datetime) {
 <script>
 const csrfToken = '<?= generateCsrfToken() ?>';
 
+// Global functions for edit/delete (called via onclick)
+function openEditModal(postId, postType, btn) {
+    const content = btn.dataset.content || '';
+    const title = btn.dataset.title || '';
+    
+    document.getElementById('editPostId').value = postId;
+    document.getElementById('editPostContent').value = content;
+    document.getElementById('editPostTitle').value = title;
+    
+    const titleGroup = document.getElementById('editTitleGroup');
+    if (postType === 'forum' || postType === 'meetup') {
+        titleGroup.style.display = 'block';
+    } else {
+        titleGroup.style.display = 'none';
+    }
+    
+    const editModal = new bootstrap.Modal(document.getElementById('editPostModal'));
+    editModal.show();
+}
+
+function openDeleteModal(postId) {
+    document.getElementById('deletePostId').value = postId;
+    const deleteModal = new bootstrap.Modal(document.getElementById('deletePostModal'));
+    deleteModal.show();
+}
+
+async function submitEditPost() {
+    const postId = document.getElementById('editPostId').value;
+    const content = document.getElementById('editPostContent').value;
+    const title = document.getElementById('editPostTitle').value;
+    
+    try {
+        const response = await fetch('/feed/edit', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+            body: `csrf_token=${csrfToken}&post_id=${postId}&content=${encodeURIComponent(content)}&title=${encodeURIComponent(title)}`
+        });
+        
+        const data = await response.json();
+        
+        if (data.success) {
+            // Update the post content in the DOM
+            const postCard = document.querySelector(`.post-card[data-post-id="${postId}"]`);
+            if (postCard) {
+                const postText = postCard.querySelector('.post-text');
+                if (postText) {
+                    postText.innerHTML = content.replace(/\n/g, '<br>');
+                }
+                const postTitle = postCard.querySelector('.post-title, .meetup-title');
+                if (postTitle && title) {
+                    postTitle.innerHTML = postTitle.querySelector('i') ? 
+                        `<i class="bi bi-calendar-event"></i> ${title}` : title;
+                }
+                // Update the edit button data attributes
+                const editBtn = postCard.querySelector('.edit-post-btn');
+                if (editBtn) {
+                    editBtn.dataset.content = content;
+                    editBtn.dataset.title = title;
+                }
+            }
+            
+            bootstrap.Modal.getInstance(document.getElementById('editPostModal')).hide();
+        } else {
+            alert(data.message || 'Failed to update post');
+        }
+    } catch (error) {
+        console.error('Error:', error);
+        alert('Failed to update post');
+    }
+}
+
+async function confirmDeletePost() {
+    const postId = document.getElementById('deletePostId').value;
+    
+    try {
+        const response = await fetch('/feed/delete', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+            body: `csrf_token=${csrfToken}&post_id=${postId}`
+        });
+        
+        const data = await response.json();
+        
+        if (data.success) {
+            // Remove the post from the DOM with animation
+            const postCard = document.querySelector(`.post-card[data-post-id="${postId}"]`);
+            if (postCard) {
+                postCard.style.transition = 'all 0.3s ease';
+                postCard.style.opacity = '0';
+                postCard.style.transform = 'scale(0.9)';
+                setTimeout(() => postCard.remove(), 300);
+            }
+            
+            bootstrap.Modal.getInstance(document.getElementById('deletePostModal')).hide();
+        } else {
+            alert(data.message || 'Failed to delete post');
+        }
+    } catch (error) {
+        console.error('Error:', error);
+        alert('Failed to delete post');
+    }
+}
+
 function debounce(func, wait) {
     let timeout;
     return function(...args) {
@@ -1540,119 +1645,6 @@ document.addEventListener('DOMContentLoaded', () => {
     document.getElementById('createPostModal').addEventListener('shown.bs.modal', () => {
         if (document.getElementById('postType').value === 'meetup') {
             setTimeout(initMeetupMap, 100);
-        }
-    });
-    
-    // Edit post handlers
-    document.querySelectorAll('.edit-post-btn').forEach(btn => {
-        btn.addEventListener('click', () => {
-            const postId = btn.dataset.postId;
-            const postType = btn.dataset.postType;
-            const content = btn.dataset.content;
-            const title = btn.dataset.title;
-            
-            document.getElementById('editPostId').value = postId;
-            document.getElementById('editPostContent').value = content;
-            document.getElementById('editPostTitle').value = title;
-            
-            // Show/hide title field based on post type
-            const titleGroup = document.getElementById('editTitleGroup');
-            if (postType === 'forum' || postType === 'meetup') {
-                titleGroup.style.display = 'block';
-            } else {
-                titleGroup.style.display = 'none';
-            }
-            
-            const editModal = new bootstrap.Modal(document.getElementById('editPostModal'));
-            editModal.show();
-        });
-    });
-    
-    // Submit edit post
-    document.getElementById('submitEditPost').addEventListener('click', async () => {
-        const postId = document.getElementById('editPostId').value;
-        const content = document.getElementById('editPostContent').value;
-        const title = document.getElementById('editPostTitle').value;
-        
-        try {
-            const response = await fetch('/feed/edit', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
-                body: `csrf_token=${csrfToken}&post_id=${postId}&content=${encodeURIComponent(content)}&title=${encodeURIComponent(title)}`
-            });
-            
-            const data = await response.json();
-            
-            if (data.success) {
-                // Update the post content in the DOM
-                const postCard = document.querySelector(`.post-card[data-post-id="${postId}"]`);
-                if (postCard) {
-                    const postText = postCard.querySelector('.post-text');
-                    if (postText) {
-                        postText.innerHTML = content.replace(/\n/g, '<br>');
-                    }
-                    const postTitle = postCard.querySelector('.post-title, .meetup-title');
-                    if (postTitle && title) {
-                        postTitle.innerHTML = postTitle.querySelector('i') ? 
-                            `<i class="bi bi-calendar-event"></i> ${title}` : title;
-                    }
-                    // Update the edit button data attributes
-                    const editBtn = postCard.querySelector('.edit-post-btn');
-                    if (editBtn) {
-                        editBtn.dataset.content = content;
-                        editBtn.dataset.title = title;
-                    }
-                }
-                
-                bootstrap.Modal.getInstance(document.getElementById('editPostModal')).hide();
-            } else {
-                alert(data.message || 'Failed to update post');
-            }
-        } catch (error) {
-            console.error('Error:', error);
-            alert('Failed to update post');
-        }
-    });
-    
-    // Delete post handlers
-    document.querySelectorAll('.delete-post-btn').forEach(btn => {
-        btn.addEventListener('click', () => {
-            document.getElementById('deletePostId').value = btn.dataset.postId;
-            const deleteModal = new bootstrap.Modal(document.getElementById('deletePostModal'));
-            deleteModal.show();
-        });
-    });
-    
-    // Confirm delete post
-    document.getElementById('confirmDeletePost').addEventListener('click', async () => {
-        const postId = document.getElementById('deletePostId').value;
-        
-        try {
-            const response = await fetch('/feed/delete', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
-                body: `csrf_token=${csrfToken}&post_id=${postId}`
-            });
-            
-            const data = await response.json();
-            
-            if (data.success) {
-                // Remove the post from the DOM with animation
-                const postCard = document.querySelector(`.post-card[data-post-id="${postId}"]`);
-                if (postCard) {
-                    postCard.style.transition = 'all 0.3s ease';
-                    postCard.style.opacity = '0';
-                    postCard.style.transform = 'scale(0.9)';
-                    setTimeout(() => postCard.remove(), 300);
-                }
-                
-                bootstrap.Modal.getInstance(document.getElementById('deletePostModal')).hide();
-            } else {
-                alert(data.message || 'Failed to delete post');
-            }
-        } catch (error) {
-            console.error('Error:', error);
-            alert('Failed to delete post');
         }
     });
 });

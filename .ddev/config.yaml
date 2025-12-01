@@ -7,7 +7,7 @@ router_http_port: "8080"
 router_https_port: "8443"
 xdebug_enabled: false
 additional_hostnames:
-    - 192.168.86.28.nip.io
+    - 192.168.86.28
 additional_fqdns: []
 database:
     type: mysql

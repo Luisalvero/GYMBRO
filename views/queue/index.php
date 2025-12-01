@@ -144,11 +144,11 @@ function showMatchPopup(matchedUserName) {
         </div>
         <div class="match-popup">
             <div class="match-icon">
-                <i class="bi bi-heart-fill"></i>
-                <i class="bi bi-heart-fill"></i>
+                <span class="flex-arm flex-left">💪</span>
+                <span class="flex-arm flex-right">💪</span>
             </div>
             <h2 class="match-title">IT'S A MATCH!</h2>
-            <p class="match-subtitle">You and <strong>${matchedUserName || 'your new bro'}</strong> liked each other</p>
+            <p class="match-subtitle">You and <strong>${matchedUserName || 'your new bro'}</strong> are ready to crush it together</p>
             <div class="match-actions">
                 <button class="btn btn-primary btn-lg" onclick="window.location.href='/matches'">
                     <i class="bi bi-chat-dots"></i> View Matches
@@ -316,31 +316,45 @@ function closeMatchPopup() {
     font-size: 5rem;
     margin-bottom: 1.5rem;
     position: relative;
-    display: inline-block;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
 }
 
-.match-icon i {
-    color: var(--primary);
+.match-icon .flex-arm {
     filter: drop-shadow(0 0 20px rgba(255, 68, 68, 0.8));
-    animation: heartPulse 1s ease-in-out infinite;
+    animation: flexPulse 1s ease-in-out infinite;
 }
 
-.match-icon i:first-child {
-    margin-right: -1rem;
+.match-icon .flex-left {
+    transform: scaleX(-1);
     animation-delay: 0s;
 }
 
-.match-icon i:last-child {
-    margin-left: -1rem;
+.match-icon .flex-right {
     animation-delay: 0.5s;
 }
 
-@keyframes heartPulse {
+@keyframes flexPulse {
     0%, 100% {
         transform: scale(1);
     }
     50% {
-        transform: scale(1.15);
+        transform: scale(1.2);
+    }
+}
+
+.match-icon .flex-left {
+    animation: flexPulseLeft 1s ease-in-out infinite;
+}
+
+@keyframes flexPulseLeft {
+    0%, 100% {
+        transform: scaleX(-1) scale(1);
+    }
+    50% {
+        transform: scaleX(-1) scale(1.2);
     }
 }
 

@@ -1,6 +1,6 @@
 <?php
 
-require_once __DIR__ . '/../../src/helpers.php';
+require_once __DIR__ . '/../../src/bootstrap.php';
 
 startSession();
 requireLogin();
@@ -30,7 +30,7 @@ if ($postId <= 0) {
 }
 
 $pdo = getDb();
-$currentUser = getCurrentUser($pdo);
+$currentUser = getCurrentUser();
 
 // Check if post exists and belongs to current user
 $stmt = $pdo->prepare('SELECT id, user_id, post_type FROM posts WHERE id = ?');
@@ -42,7 +42,7 @@ if (!$post) {
     exit;
 }
 
-if ($post['user_id'] !== $currentUser['id']) {
+if ((int)$post['user_id'] !== (int)$currentUser['id']) {
     http_response_code(403);
     echo json_encode(['success' => false, 'message' => 'You can only edit your own posts']);
     exit;
@@ -52,19 +52,25 @@ if ($post['user_id'] !== $currentUser['id']) {
 try {
     if ($post['post_type'] === 'forum' || $post['post_type'] === 'meetup') {
         $stmt = $pdo->prepare('UPDATE posts SET content = ?, title = ?, updated_at = NOW() WHERE id = ?');
-        $stmt->execute([$content, $title, $postId]);
+        $result = $stmt->execute([$content, $title, $postId]);
     } else {
         $stmt = $pdo->prepare('UPDATE posts SET content = ?, updated_at = NOW() WHERE id = ?');
-        $stmt->execute([$content, $postId]);
+        $result = $stmt->execute([$content, $postId]);
     }
     
-    echo json_encode([
-        'success' => true,
-        'message' => 'Post updated successfully',
-        'content' => $content,
-        'title' => $title
-    ]);
+    if ($result) {
+        echo json_encode([
+            'success' => true,
+            'message' => 'Post updated successfully',
+            'content' => $content,
+            'title' => $title
+        ]);
+    } else {
+        $errorInfo = $stmt->errorInfo();
+        error_log('Edit post SQL error: ' . print_r($errorInfo, true));
+        echo json_encode(['success' => false, 'message' => 'Database error: ' . ($errorInfo[2] ?? 'Unknown error')]);
+    }
 } catch (PDOException $e) {
     error_log('Edit post error: ' . $e->getMessage());
-    echo json_encode(['success' => false, 'message' => 'Failed to update post']);
+    echo json_encode(['success' => false, 'message' => 'Database error: ' . $e->getMessage()]);
 }

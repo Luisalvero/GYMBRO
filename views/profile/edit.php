@@ -112,27 +112,27 @@ $workoutStyles = is_array($user['workout_styles']) ? $user['workout_styles'] : (
                     
                     <div class="mb-3">
                         <label class="form-label">Workout Styles *</label>
-                        <div class="row">
-                            <div class="col-6">
-                                <div class="form-check">
-                                    <input class="form-check-input" type="checkbox" name="workout_styles[]" value="calisthenics" id="ws1" <?= in_array('calisthenics', $workoutStyles) ? 'checked' : '' ?>>
-                                    <label class="form-check-label" for="ws1">Calisthenics</label>
-                                </div>
-                                <div class="form-check">
-                                    <input class="form-check-input" type="checkbox" name="workout_styles[]" value="weightlifting" id="ws2" <?= in_array('weightlifting', $workoutStyles) ? 'checked' : '' ?>>
-                                    <label class="form-check-label" for="ws2">Weightlifting</label>
-                                </div>
-                            </div>
-                            <div class="col-6">
-                                <div class="form-check">
-                                    <input class="form-check-input" type="checkbox" name="workout_styles[]" value="cardio" id="ws3" <?= in_array('cardio', $workoutStyles) ? 'checked' : '' ?>>
-                                    <label class="form-check-label" for="ws3">Cardio</label>
-                                </div>
-                                <div class="form-check">
-                                    <input class="form-check-input" type="checkbox" name="workout_styles[]" value="athletic" id="ws4" <?= in_array('athletic', $workoutStyles) ? 'checked' : '' ?>>
-                                    <label class="form-check-label" for="ws4">Athletic</label>
-                                </div>
-                            </div>
+                        <div class="workout-boxes">
+                            <label class="workout-box <?= in_array('calisthenics', $workoutStyles) ? 'selected' : '' ?>">
+                                <input type="checkbox" name="workout_styles[]" value="calisthenics" <?= in_array('calisthenics', $workoutStyles) ? 'checked' : '' ?>>
+                                <i class="bi bi-person-arms-up"></i>
+                                <span>Calisthenics</span>
+                            </label>
+                            <label class="workout-box <?= in_array('weightlifting', $workoutStyles) ? 'selected' : '' ?>">
+                                <input type="checkbox" name="workout_styles[]" value="weightlifting" <?= in_array('weightlifting', $workoutStyles) ? 'checked' : '' ?>>
+                                <i class="bi bi-trophy"></i>
+                                <span>Weightlifting</span>
+                            </label>
+                            <label class="workout-box <?= in_array('cardio', $workoutStyles) ? 'selected' : '' ?>">
+                                <input type="checkbox" name="workout_styles[]" value="cardio" <?= in_array('cardio', $workoutStyles) ? 'checked' : '' ?>>
+                                <i class="bi bi-heart-pulse"></i>
+                                <span>Cardio</span>
+                            </label>
+                            <label class="workout-box <?= in_array('athletic', $workoutStyles) ? 'selected' : '' ?>">
+                                <input type="checkbox" name="workout_styles[]" value="athletic" <?= in_array('athletic', $workoutStyles) ? 'checked' : '' ?>>
+                                <i class="bi bi-lightning-charge"></i>
+                                <span>Athletic</span>
+                            </label>
                         </div>
                     </div>
                     
@@ -298,19 +298,22 @@ $workoutStyles = is_array($user['workout_styles']) ? $user['workout_styles'] : (
 }
 
 /* Gender preference boxes */
-.gender-boxes {
+.gender-boxes,
+.workout-boxes {
     display: grid;
     grid-template-columns: repeat(4, 1fr);
     gap: 1rem;
 }
 
 @media (max-width: 768px) {
-    .gender-boxes {
+    .gender-boxes,
+    .workout-boxes {
         grid-template-columns: repeat(2, 1fr);
     }
 }
 
-.gender-box {
+.gender-box,
+.workout-box {
     display: flex;
     flex-direction: column;
     align-items: center;
@@ -324,18 +327,21 @@ $workoutStyles = is_array($user['workout_styles']) ? $user['workout_styles'] : (
     text-align: center;
 }
 
-.gender-box input[type="checkbox"] {
+.gender-box input[type="checkbox"],
+.workout-box input[type="checkbox"] {
     display: none;
 }
 
-.gender-box i {
+.gender-box i,
+.workout-box i {
     font-size: 2rem;
     margin-bottom: 0.5rem;
     color: var(--text-muted);
     transition: all 0.3s ease;
 }
 
-.gender-box span {
+.gender-box span,
+.workout-box span {
     font-weight: 600;
     text-transform: uppercase;
     font-size: 0.85rem;
@@ -344,17 +350,21 @@ $workoutStyles = is_array($user['workout_styles']) ? $user['workout_styles'] : (
     transition: all 0.3s ease;
 }
 
-.gender-box:hover {
+.gender-box:hover,
+.workout-box:hover {
     border-color: var(--primary);
     background: rgba(255, 68, 68, 0.05);
 }
 
 .gender-box:hover i,
-.gender-box:hover span {
+.gender-box:hover span,
+.workout-box:hover i,
+.workout-box:hover span {
     color: var(--primary);
 }
 
-.gender-box.selected {
+.gender-box.selected,
+.workout-box.selected {
     border-color: var(--primary);
     background: rgba(255, 68, 68, 0.1);
     box-shadow: 
@@ -363,12 +373,14 @@ $workoutStyles = is_array($user['workout_styles']) ? $user['workout_styles'] : (
         inset 0 0 20px rgba(255, 68, 68, 0.1);
 }
 
-.gender-box.selected i {
+.gender-box.selected i,
+.workout-box.selected i {
     color: var(--primary);
     filter: drop-shadow(0 0 8px rgba(255, 68, 68, 0.8));
 }
 
-.gender-box.selected span {
+.gender-box.selected span,
+.workout-box.selected span {
     color: var(--primary);
     text-shadow: 0 0 10px rgba(255, 68, 68, 0.5);
 }
@@ -557,6 +569,15 @@ document.addEventListener('DOMContentLoaded', () => {
     
     // Gender box toggle
     document.querySelectorAll('.gender-box').forEach(box => {
+        box.addEventListener('click', function() {
+            const checkbox = this.querySelector('input[type="checkbox"]');
+            checkbox.checked = !checkbox.checked;
+            this.classList.toggle('selected', checkbox.checked);
+        });
+    });
+    
+    // Workout box toggle
+    document.querySelectorAll('.workout-box').forEach(box => {
         box.addEventListener('click', function() {
             const checkbox = this.querySelector('input[type="checkbox"]');
             checkbox.checked = !checkbox.checked;
