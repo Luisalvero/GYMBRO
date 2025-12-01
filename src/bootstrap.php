@@ -6,6 +6,10 @@
  * sets up error handling, and provides global helper functions
  */
 
+// Always show errors during initial setup - remove in production later
+error_reporting(E_ALL);
+ini_set('display_errors', 1);
+
 // Set error reporting based on environment
 $config = require __DIR__ . '/../config/app.php';
 
