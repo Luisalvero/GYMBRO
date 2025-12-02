@@ -32,6 +32,9 @@ $routes = [
         '/queue' => 'controllers/queue/index.php',
         '/feed' => 'controllers/feed/index.php',
         '/matches' => 'controllers/matches/index.php',
+        '/messages' => 'controllers/messages/index.php',
+        '/messages/view' => 'controllers/messages/view.php',
+        '/messages/fetch' => 'controllers/messages/fetch.php',
     ],
     'POST' => [
         '/login' => 'controllers/auth/login.php',
@@ -45,6 +48,7 @@ $routes = [
         '/feed/rsvp' => 'controllers/feed/rsvp.php',
         '/feed/edit' => 'controllers/feed/edit_post.php',
         '/feed/delete' => 'controllers/feed/delete_post.php',
+        '/messages/send' => 'controllers/messages/send.php',
     ],
 ];
 

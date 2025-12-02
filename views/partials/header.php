@@ -327,7 +327,27 @@
                 <span class="navbar-toggler-icon"></span>
             </button>
             <div class="collapse navbar-collapse" id="navbarNav">
-                <?php if (isLoggedIn()): ?>
+                <?php if (isLoggedIn()): 
+                    // Get unread message count
+                    $unreadCount = 0;
+                    try {
+                        $db = getDb();
+                        $userId = getCurrentUserId();
+                        $stmt = $db->prepare("
+                            SELECT COUNT(*) 
+                            FROM messages msg
+                            JOIN conversations c ON msg.conversation_id = c.id
+                            JOIN matches m ON c.match_id = m.id
+                            WHERE msg.sender_id != ? 
+                            AND msg.read_at IS NULL
+                            AND (m.user1_id = ? OR m.user2_id = ?)
+                        ");
+                        $stmt->execute([$userId, $userId, $userId]);
+                        $unreadCount = (int)$stmt->fetchColumn();
+                    } catch (Exception $e) {
+                        $unreadCount = 0;
+                    }
+                ?>
                     <ul class="navbar-nav ms-auto">
                         <li class="nav-item">
                             <a class="nav-link" href="/feed">
@@ -342,6 +362,14 @@
                         <li class="nav-item">
                             <a class="nav-link" href="/matches">
                                 <i class="bi bi-people"></i> Matches
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="/messages">
+                                <i class="bi bi-chat-dots"></i> Messages
+                                <?php if ($unreadCount > 0): ?>
+                                    <span class="badge bg-danger rounded-pill"><?= $unreadCount > 99 ? '99+' : $unreadCount ?></span>
+                                <?php endif; ?>
                             </a>
                         </li>
                         <li class="nav-item">

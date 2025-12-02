@@ -39,6 +39,18 @@ try {
         
         $stmt = $db->prepare('INSERT INTO matches (user1_id, user2_id) VALUES (?, ?) ON DUPLICATE KEY UPDATE user1_id=user1_id');
         $stmt->execute([$user1, $user2]);
+        
+        // Get the match ID (either just inserted or existing)
+        $stmt = $db->prepare('SELECT id FROM matches WHERE user1_id = ? AND user2_id = ?');
+        $stmt->execute([$user1, $user2]);
+        $match = $stmt->fetch();
+        
+        // Create a conversation for this match if it doesn't exist
+        if ($match) {
+            $stmt = $db->prepare('INSERT INTO conversations (match_id) VALUES (?) ON DUPLICATE KEY UPDATE match_id=match_id');
+            $stmt->execute([$match['id']]);
+        }
+        
         $isMatch = true;
     }
     

@@ -261,3 +261,18 @@ function logError(string $message, array $context = []): void {
     }
     error_log($logMessage);
 }
+
+/**
+ * Format a datetime as a human-readable "time ago" string
+ */
+function timeAgo($datetime) {
+    if (!$datetime) return '';
+    $time = strtotime($datetime);
+    $diff = time() - $time;
+    
+    if ($diff < 60) return 'just now';
+    if ($diff < 3600) return floor($diff / 60) . 'm ago';
+    if ($diff < 86400) return floor($diff / 3600) . 'h ago';
+    if ($diff < 604800) return floor($diff / 86400) . 'd ago';
+    return date('M j', $time);
+}
